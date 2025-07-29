@@ -1,44 +1,484 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>LLIT Testing Page</title>
-<style>
-  body {
-    background-color: #1d1d1d; /* Dark background */
-    color: #7289da; /* Light blue/purple for text */
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Dino Remake</p>
+    <!-- Google Fonts - Press Start 2P for retro feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Tone.js for sound effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100vw; /* Make body full width */
+            margin: 0;
+            background-color: #282c34; /* Dark background */
+            font-family: 'Press Start 2P', cursive; /* Retro pixel font */
+            color: #e0e0e0;
+            overflow: hidden; /* Prevent scrollbars */
+            box-sizing: border-box;
+        }
 
-  .container {
-    background-color: #2a2a2a; /* Slightly lighter dark for container */
-    padding: 50px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: center;
-  }
+        .game-container {
+            position: relative;
+            width: 100vw; /* Full viewport width */
+            height: 100vh; /* Full viewport height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: transparent; /* Game background will be canvas */
+            overflow: hidden;
+        }
 
-  h1 {
-    color: #7289da; /* Ensure heading also uses the theme color */
-    font-size: 3em;
-    margin-bottom: 20px;
-  }
+        canvas {
+            display: block;
+            background-color: #ffffff; /* White canvas background */
+            touch-action: manipulation; /* Prevent double-tap zoom on touch devices */
+        }
 
-  p {
-    font-size: 1.2em;
-  }
-</style>
+        .score-display {
+            position: absolute;
+            top: 20px;
+            font-size: 1.5em;
+            color: #333;
+            z-index: 10;
+            text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.5); /* Pixelated shadow */
+        }
+
+        #highScore {
+            left: 20px;
+        }
+
+        #currentScore {
+            right: 20px;
+        }
+
+        .message-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8); /* Darker, more opaque background */
+            color: white;
+            padding: 30px 40px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            z-index: 20;
+            display: none; /* Hidden by default */
+            box-shadow: 0 0 25px rgba(138, 43, 226, 0.9), 0 0 40px rgba(138, 43, 226, 0.6); /* Stronger glow */
+            border: 2px solid #8a2be2; /* Purple border */
+        }
+
+        .message-box button, .control-button {
+            background-color: #8a2be2; /* Purple button */
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 0 12px rgba(138, 43, 226, 0.6);
+        }
+
+        .message-box button:hover, .control-button:hover {
+            background-color: #9932cc; /* Darker purple on hover */
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.9);
+        }
+
+        .control-button {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none; /* Hidden initially */
+            margin-top: 0; /* Override margin-top from message-box button */
+            padding: 8px 15px; /* Smaller padding for control button */
+            font-size: 0.8em;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .score-display {
+                font-size: 1.2em;
+                top: 10px;
+            }
+            #highScore {
+                left: 10px;
+            }
+            #currentScore {
+                right: 10px;
+            }
+            .message-box {
+                font-size: 1em;
+                padding: 20px 25px;
+                border-radius: 10px;
+            }
+            .message-box button, .control-button {
+                font-size: 0.8em;
+                padding: 10px 20px;
+            }
+            .control-button {
+                padding: 6px 12px;
+                font-size: 0.7em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .score-display {
+                font-size: 0.9em;
+                top: 5px;
+            }
+            #highScore {
+                left: 5px;
+            }
+            #currentScore {
+                right: 5px;
+            }
+            .message-box {
+                font-size: 0.8em;
+                padding: 15px 20px;
+                border-radius: 8px;
+            }
+            .message-box button, .control-button {
+                font-size: 0.7em;
+                padding: 8px 15px;
+            }
+            .control-button {
+                padding: 4px 10px;
+                font-size: 0.6em;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="game-container">
+        <div class="score-display" id="highScore">HIGH SCORE: 0</div>
+        <div class="score-display" id="currentScore">SCORE: 0</div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="message-box" id="messageBox">
+            <span id="messageText">Press SPACE or tap to start!</span>
+            <button id="restartButton">Start Game</button>
+        </div>
+        <button id="pauseButton" class="control-button">Pause</button>
+    </div>
 
-<div class="container">
-  <h1>LLIT</h1>
-  <p>This is a testing page using your theme colors.</p>
-</div>
+    <script>
+        window.onload = function() {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const currentScoreDisplay = document.getElementById('currentScore');
+            const highScoreDisplay = document.getElementById('highScore');
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const restartButton = document.getElementById('restartButton');
+            const pauseButton = document.getElementById('pauseButton');
 
+            // Game variables
+            let gameSpeed = 5;
+            let score = 0;
+            let highScore = localStorage.getItem('dinoHighScore') || 0;
+            let isGameOver = true;
+            let isPaused = false;
+            let animationFrameId; // To store the requestAnimationFrame ID
+
+            // Sound effects using Tone.js
+            const jumpSynth = new Tone.MembraneSynth({
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 0.2 },
+                octaves: 10
+            }).toDestination();
+            const gameOverSynth = new Tone.NoiseSynth({
+                noise: { type: "white" },
+                envelope: { attack: 0.005, decay: 0.2, sustain: 0, release: 0.1 }
+            }).toDestination();
+
+            function playJumpSound() {
+                jumpSynth.triggerAttackRelease("C4", "8n");
+            }
+
+            function playGameOverSound() {
+                gameOverSynth.triggerAttackRelease("4n");
+            }
+
+            // Dino properties
+            const dino = {
+                x: 0, // Will be set relative to canvas width
+                y: 0, // Will be set relative to canvas height
+                width: 0, // Will be set relative to canvas width
+                height: 0, // Will be set relative to canvas height
+                velocityY: 0,
+                gravity: 0.6,
+                isJumping: false,
+                draw() {
+                    ctx.fillStyle = '#4CAF50'; /* Green dino */
+                    ctx.beginPath();
+                    // Simplified pixel-art-like dino shape
+                    const scale = this.width / 40; // Scale based on original width 40
+                    ctx.moveTo(this.x, this.y + this.height);
+                    ctx.lineTo(this.x + this.width * 0.7 * scale, this.y + this.height);
+                    ctx.lineTo(this.x + this.width * scale, this.y + this.height * 0.7 * scale);
+                    ctx.lineTo(this.x + this.width * 0.8 * scale, this.y + this.height * 0.2 * scale);
+                    ctx.lineTo(this.x + this.width * 0.6 * scale, this.y);
+                    ctx.lineTo(this.x + this.width * 0.2 * scale, this.y);
+                    ctx.lineTo(this.x, this.y + this.height * 0.5 * scale);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Eye (simple dot)
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(this.x + this.width * 0.7 * scale, this.y + this.height * 0.15 * scale, 3 * scale, 3 * scale);
+                },
+                jump() {
+                    if (!this.isJumping && !isGameOver && !isPaused) {
+                        this.velocityY = -canvas.height * 0.03; // Jump height relative to canvas height
+                        this.isJumping = true;
+                        playJumpSound();
+                    }
+                },
+                update() {
+                    this.velocityY += this.gravity;
+                    this.y += this.velocityY;
+
+                    // Prevent dino from falling through the ground
+                    if (this.y + this.height > ground.y) {
+                        this.y = ground.y - this.height;
+                        this.velocityY = 0;
+                        this.isJumping = false;
+                    }
+                }
+            };
+
+            // Obstacle properties
+            class Obstacle {
+                constructor(x, width, height) {
+                    this.x = x;
+                    this.y = ground.y - height;
+                    this.width = width;
+                    this.height = height;
+                    this.color = '#FF5722'; /* Orange-red obstacle */
+                }
+
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    // Simplified pixel-art-like cactus shape
+                    const scale = this.width / 40; // Scale based on original width 40
+                    // Main stem
+                    ctx.fillRect(this.x + this.width * 0.4 * scale, this.y, this.width * 0.2 * scale, this.height);
+                    // Left arm
+                    ctx.fillRect(this.x, this.y + this.height * 0.4 * scale, this.width * 0.4 * scale, this.height * 0.2 * scale);
+                    ctx.fillRect(this.x, this.y + this.height * 0.2 * scale, this.width * 0.2 * scale, this.height * 0.2 * scale);
+                    // Right arm
+                    ctx.fillRect(this.x + this.width * 0.6 * scale, this.y + this.height * 0.3 * scale, this.width * 0.4 * scale, this.height * 0.2 * scale);
+                    ctx.fillRect(this.x + this.width * 0.8 * scale, this.y + this.height * 0.1 * scale, this.width * 0.2 * scale, this.height * 0.2 * scale);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                update() {
+                    this.x -= gameSpeed;
+                }
+            }
+
+            let obstacles = [];
+            let lastObstacleTime = 0;
+            let obstacleSpawnInterval = 1500; // Milliseconds
+
+            // Ground properties
+            const ground = {
+                y: 0, // Will be set relative to canvas height
+                height: 0, // Will be set relative to canvas height
+                color: '#795548', /* Brown ground */
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(0, this.y, canvas.width, this.height);
+                    // Add multiple thin black lines for a more textured ground surface
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 2;
+                    for (let i = 0; i < 3; i++) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, this.y + i * (this.height / 3));
+                        ctx.lineTo(canvas.width, this.y + i * (this.height / 3));
+                        ctx.stroke();
+                    }
+                }
+            };
+
+            // Resize canvas function
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                // Adjust game elements based on new canvas size
+                dino.width = canvas.width * 0.03; // ~3% of width
+                dino.height = canvas.height * 0.1; // ~10% of height
+                dino.x = canvas.width * 0.05; // ~5% from left
+                dino.gravity = canvas.height * 0.0015; // Gravity scales with height
+
+                ground.height = canvas.height * 0.1; // Ground is 10% of canvas height
+                ground.y = canvas.height - ground.height;
+
+                dino.y = ground.y - dino.height; // Dino always on ground
+            }
+
+            // Game loop
+            function animate(currentTime) {
+                if (isGameOver || isPaused) {
+                    cancelAnimationFrame(animationFrameId);
+                    return;
+                }
+
+                animationFrameId = requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+
+                // Update and draw ground
+                ground.draw();
+
+                // Update and draw dino
+                dino.update();
+                dino.draw();
+
+                // Spawn and manage obstacles
+                if (currentTime - lastObstacleTime > obstacleSpawnInterval * (0.8 + Math.random() * 0.4)) { // Randomize spawn
+                    const obstacleWidth = canvas.width * (0.015 + Math.random() * 0.01); // Random width relative to canvas
+                    const obstacleHeight = canvas.height * (0.08 + Math.random() * 0.08); // Random height relative to canvas
+                    obstacles.push(new Obstacle(canvas.width, obstacleWidth, obstacleHeight));
+                    lastObstacleTime = currentTime;
+                }
+
+                obstacles.forEach((obstacle, index) => {
+                    obstacle.update();
+                    obstacle.draw();
+
+                    // Collision detection
+                    if (
+                        dino.x < obstacle.x + obstacle.width &&
+                        dino.x + dino.width > obstacle.x &&
+                        dino.y < obstacle.y + obstacle.height &&
+                        dino.y + dino.height > obstacle.y
+                    ) {
+                        endGame();
+                    }
+
+                    // Remove off-screen obstacles
+                    if (obstacle.x + obstacle.width < 0) {
+                        obstacles.splice(index, 1);
+                        score += 10; // Increase score for passing obstacle
+                        currentScoreDisplay.textContent = `SCORE: ${score}`;
+                        // Increase speed and decrease spawn interval gradually
+                        if (score % 50 === 0 && gameSpeed < canvas.width * 0.01) { // Cap speed
+                            gameSpeed += canvas.width * 0.0001; // Small increment relative to width
+                        }
+                        if (score % 100 === 0 && obstacleSpawnInterval > 800) { // Min interval 800ms
+                            obstacleSpawnInterval -= 50;
+                        }
+                    }
+                });
+            }
+
+            // Game start/restart
+            function startGame() {
+                score = 0;
+                gameSpeed = canvas.width * 0.005; // Initial speed relative to width
+                isGameOver = false;
+                isPaused = false;
+                dino.y = ground.y - dino.height; // Reset dino position
+                dino.velocityY = 0;
+                dino.isJumping = false;
+                obstacles = [];
+                currentScoreDisplay.textContent = `SCORE: ${score}`;
+                highScoreDisplay.textContent = `HIGH SCORE: ${highScore}`; // Update high score display
+                messageBox.style.display = 'none';
+                pauseButton.style.display = 'block'; // Show pause button
+                pauseButton.textContent = 'Pause'; // Reset pause button text
+                lastObstacleTime = performance.now(); // Initialize last obstacle time
+                animate(performance.now()); // Start the animation loop
+            }
+
+            // Game over
+            function endGame() {
+                isGameOver = true;
+                playGameOverSound();
+                updateHighScore(); // Update high score on game over
+                messageText.textContent = `Game Over! Your score: ${score}`;
+                restartButton.textContent = 'Restart'; // Change button text to Restart
+                messageBox.style.display = 'block';
+                pauseButton.style.display = 'none'; // Hide pause button on game over
+                cancelAnimationFrame(animationFrameId); // Stop the animation loop
+            }
+
+            // Update high score in localStorage
+            function updateHighScore() {
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('dinoHighScore', highScore);
+                    highScoreDisplay.textContent = `HIGH SCORE: ${highScore}`;
+                }
+            }
+
+            // Toggle Pause
+            function togglePause() {
+                isPaused = !isPaused;
+                if (isPaused) {
+                    cancelAnimationFrame(animationFrameId);
+                    messageText.textContent = 'Paused';
+                    restartButton.style.display = 'none'; // Hide restart button when paused
+                    messageBox.style.display = 'block';
+                    pauseButton.textContent = 'Resume';
+                } else {
+                    messageBox.style.display = 'none';
+                    restartButton.style.display = 'block'; // Show restart button when resumed
+                    pauseButton.textContent = 'Pause';
+                    animate(performance.now());
+                }
+            }
+
+            // Event Listeners
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space' && !isGameOver && !isPaused) {
+                    dino.jump();
+                } else if (e.code === 'Space' && isGameOver) {
+                    startGame(); // Restart on space if game over
+                } else if (e.code === 'Space' && isPaused) {
+                    togglePause(); // Resume on space if paused
+                } else if (e.code === 'KeyP' && !isGameOver) {
+                    togglePause(); // Pause/Resume on 'P' key
+                }
+            });
+
+            // Touch event for jump/start/resume
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Prevent scrolling/zooming
+                if (isGameOver || isPaused) {
+                    if (isPaused) {
+                        togglePause(); // Resume on tap if paused
+                    } else {
+                        startGame(); // Start on tap if game over
+                    }
+                } else {
+                    dino.jump();
+                }
+            });
+
+            restartButton.addEventListener('click', startGame);
+            pauseButton.addEventListener('click', togglePause);
+
+            // Initial setup
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            highScoreDisplay.textContent = `HIGH SCORE: ${highScore}`; // Set initial high score display
+            messageBox.style.display = 'block'; // Show initial message
+            restartButton.textContent = 'Start Game'; // Initial button text
+        };
+    </script>
 </body>
 </html>
