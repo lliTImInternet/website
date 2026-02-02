@@ -1,88 +1,104 @@
 body {
-     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-     margin: 0;
-     padding: 0;
-     height: 100vh;
-     background-color: #ffffff;
-     display: flex;
-     flex-direction: column;
-     justify-content: center;
-     align-items: center;
-     overflow: hidden;
-     color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    color: #333;
 }
- .main-content {
-     text-align: center;
-     z-index: 2;
+
+.main-content {
+    text-align: center;
+    z-index: 2;
 }
- h1 {
-     font-size: 3.5rem;
-     margin: 0;
-     letter-spacing: -2px;
-     font-weight: 700;
+
+/* IMAGE SHINE LOGIC */
+.logo-wrapper {
+    display: inline-block;
 }
- p {
-     font-size: 1.1rem;
-     color: #888;
-     margin-top: 8px;
+
+.constant-shine-img {
+    max-width: 250px;
+    height: auto;
+    display: block;
+
+    /* The constant shine effect */
+    -webkit-mask-image: linear-gradient(-75deg, rgba(0,0,0,0.4) 30%, #000 50%, rgba(0,0,0,0.4) 70%);
+    mask-image: linear-gradient(-75deg, rgba(0,0,0,0.4) 30%, #000 50%, rgba(0,0,0,0.4) 70%);
+    -webkit-mask-size: 200%;
+    mask-size: 200%;
+    
+    animation: shineMove 4s linear infinite;
 }
-/* Centered Subtle Wave */
- .wave-container {
-     position: absolute;
-     top: 50%;
-     left: 0;
-     width: 100%;
-     transform: translateY(-50%);
-     line-height: 0;
-     z-index: 1;
-     pointer-events: none;
+
+p {
+    font-size: 1.1rem;
+    color: #888;
+    margin-top: 15px;
 }
- .wave-svg {
-     display: block;
-     width: 200%;
-     height: 300px;
-     opacity: 0.3;
+
+/* WAVE ANIMATION */
+.wave-container {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    transform: translateY(-50%);
+    line-height: 0;
+    z-index: 1;
+    pointer-events: none;
 }
- .wave-path {
-     fill: #f0f0f5;
-     animation: waveMove 12s ease-in-out infinite alternate;
+
+.wave-svg {
+    display: block;
+    width: 200%;
+    height: 300px;
+    opacity: 0.3;
 }
- @keyframes waveMove {
-     from {
-         transform: translateX(0);
-    }
-     to {
-         transform: translateX(-40%);
-    }
+
+.wave-path {
+    fill: #f0f0f5;
+    animation: waveMove 12s ease-in-out infinite alternate;
 }
-/* Animated Shining Discord Link */
- footer {
-     position: fixed;
-     bottom: 40px;
-     z-index: 3;
+
+@keyframes waveMove {
+    from { transform: translateX(0); }
+    to { transform: translateX(-40%); }
 }
- .discord-handle {
-     font-size: 0.8rem;
-     text-decoration: none;
-     font-weight: 500;
-     letter-spacing: 1px;
-    /* Shine Effect Setup */
-     color: rgba(180, 180, 180, 0.4);
-     background: linear-gradient(to right, #bbb 20%, #fff 50%, #bbb 80%);
-     background-size: 200% auto;
-     -webkit-background-clip: text;
-     background-clip: text;
-     -webkit-text-fill-color: transparent;
-     animation: shine 4s linear infinite;
+
+/* FOOTER / DISCORD SHINE */
+footer {
+    position: fixed;
+    bottom: 40px;
+    z-index: 3;
 }
- @keyframes shine {
-     to {
-         background-position: 200% center;
-    }
+
+.discord-handle {
+    font-size: 0.8rem;
+    text-decoration: none;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: rgba(180, 180, 180, 0.4);
+    background: linear-gradient(to right, #bbb 20%, #fff 50%, #bbb 80%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shineMove 4s linear infinite;
 }
-/* Hover state makes it clear/bold */
- .discord-handle:hover {
-     -webkit-text-fill-color: #5865F2;
-    /* Discord color on hover */
-     transition: 0.3s;
+
+/* Unified Shine Animation for both Text and Image */
+@keyframes shineMove {
+    0% { background-position: 200% center; -webkit-mask-position: 200% center; }
+    100% { background-position: -200% center; -webkit-mask-position: -200% center; }
+}
+
+.discord-handle:hover {
+    -webkit-text-fill-color: #5865F2;
+    transition: 0.3s;
 }
