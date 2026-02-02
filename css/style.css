@@ -15,6 +15,7 @@ body {
 .main-content {
     text-align: center;
     z-index: 2;
+    padding: 0 20px; /* Prevents text from hitting edges on small screens */
 }
 
 /* IMAGE SHINE LOGIC */
@@ -24,10 +25,10 @@ body {
 
 .constant-shine-img {
     max-width: 250px;
+    width: 100%; /* Allows it to scale down */
     height: auto;
     display: block;
 
-    /* The constant shine effect */
     -webkit-mask-image: linear-gradient(-75deg, rgba(0,0,0,0.4) 30%, #000 50%, rgba(0,0,0,0.4) 70%);
     mask-image: linear-gradient(-75deg, rgba(0,0,0,0.4) 30%, #000 50%, rgba(0,0,0,0.4) 70%);
     -webkit-mask-size: 200%;
@@ -92,7 +93,6 @@ footer {
     animation: shineMove 4s linear infinite;
 }
 
-/* Unified Shine Animation for both Text and Image */
 @keyframes shineMove {
     0% { background-position: 200% center; -webkit-mask-position: 200% center; }
     100% { background-position: -200% center; -webkit-mask-position: -200% center; }
@@ -101,4 +101,23 @@ footer {
 .discord-handle:hover {
     -webkit-text-fill-color: #5865F2;
     transition: 0.3s;
+}
+
+/* --- MOBILE SUPPORT --- */
+@media (max-width: 600px) {
+    .constant-shine-img {
+        max-width: 180px; /* Smaller logo for phones */
+    }
+
+    p {
+        font-size: 1rem;
+    }
+
+    .wave-svg {
+        height: 180px; /* Shorter wave so it doesn't crowd the screen */
+    }
+
+    footer {
+        bottom: 25px; /* Bring the contact up slightly */
+    }
 }
