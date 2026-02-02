@@ -1,21 +1,27 @@
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+/* Core Reset to prevent any accidental scrolling */
+html, body {
     margin: 0;
     padding: 0;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* This kills both side-scrolling and vertical-scrolling */
+    position: fixed; /* Extra layer of protection for mobile browsers */
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: #ffffff;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
     color: #333;
 }
 
 .main-content {
     text-align: center;
     z-index: 2;
-    padding: 0 20px; /* Prevents text from hitting edges on small screens */
+    padding: 0 20px;
 }
 
 /* IMAGE SHINE LOGIC */
@@ -25,15 +31,13 @@ body {
 
 .constant-shine-img {
     max-width: 250px;
-    width: 100%; /* Allows it to scale down */
+    width: 100%;
     height: auto;
     display: block;
-
     -webkit-mask-image: linear-gradient(-75deg, rgba(0,0,0,0.4) 30%, #000 50%, rgba(0,0,0,0.4) 70%);
     mask-image: linear-gradient(-75deg, rgba(0,0,0,0.4) 30%, #000 50%, rgba(0,0,0,0.4) 70%);
     -webkit-mask-size: 200%;
     mask-size: 200%;
-    
     animation: shineMove 4s linear infinite;
 }
 
@@ -43,21 +47,22 @@ p {
     margin-top: 15px;
 }
 
-/* WAVE ANIMATION */
+/* WAVE ANIMATION - Fixed for no side-scroll */
 .wave-container {
     position: absolute;
     top: 50%;
     left: 0;
-    width: 100%;
+    width: 100vw; /* Lock to viewport width */
     transform: translateY(-50%);
     line-height: 0;
     z-index: 1;
     pointer-events: none;
+    overflow: hidden; /* Ensures the wide SVG doesn't cause side-scrolling */
 }
 
 .wave-svg {
     display: block;
-    width: 200%;
+    width: 200%; /* Still wide for movement, but container hides the extra */
     height: 300px;
     opacity: 0.3;
 }
@@ -72,10 +77,12 @@ p {
     to { transform: translateX(-40%); }
 }
 
-/* FOOTER / DISCORD SHINE */
+/* FOOTER - Pinned to bottom */
 footer {
-    position: fixed;
-    bottom: 40px;
+    position: absolute; /* Changed from fixed for better mobile stability */
+    bottom: 30px;
+    width: 100%;
+    text-align: center;
     z-index: 3;
 }
 
@@ -98,26 +105,18 @@ footer {
     100% { background-position: -200% center; -webkit-mask-position: -200% center; }
 }
 
-.discord-handle:hover {
-    -webkit-text-fill-color: #5865F2;
-    transition: 0.3s;
-}
-
-/* --- MOBILE SUPPORT --- */
+/* MOBILE SUPPORT */
 @media (max-width: 600px) {
     .constant-shine-img {
-        max-width: 180px; /* Smaller logo for phones */
+        max-width: 180px;
     }
-
     p {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
-
     .wave-svg {
-        height: 180px; /* Shorter wave so it doesn't crowd the screen */
+        height: 150px;
     }
-
     footer {
-        bottom: 25px; /* Bring the contact up slightly */
+        bottom: 20px;
     }
 }
